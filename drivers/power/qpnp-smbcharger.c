@@ -206,7 +206,7 @@ struct smbchg_chip {
 	bool				batt_cold;
 	bool				batt_warm;
 	bool				batt_cool;
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	bool				therm_scn_support;
 	unsigned int			therm_scn;
 	unsigned int			therm_scn_levels;
@@ -281,7 +281,7 @@ struct smbchg_chip {
 	struct delayed_work		pd_charger_init_work;
 	struct delayed_work	    first_detect_float_work;
 	struct delayed_work		weak_charger_timeout_work;
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	struct delayed_work		batt_cool_warm_monitor;
 	struct delayed_work		vbus_monitor;
 #endif
@@ -382,7 +382,7 @@ enum fcc_voters {
 	BATT_TYPE_FCC_VOTER,
 	RESTRICTED_CHG_FCC_VOTER,
 	THERMAL_FCC_VOTER,
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	JEITA_FCC_VOTER,
 #endif
 	NUM_FCC_VOTER,
@@ -482,7 +482,7 @@ enum hvdcp_voters {
 	HVDCP_PULSING_VOTER,
 	NUM_HVDCP_VOTERS,
 };
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 enum thermal_scn {
 	THERMAL_NORMAL,
 	THERMAL_SCN,
@@ -2551,7 +2551,7 @@ static void smbchg_parallel_usb_enable(struct smbchg_chip *chip,
 		chip->tables.usb_ilim_ma_table[current_table_index];
 	smbchg_set_fastchg_current_raw(chip, main_fastchg_current_ma);
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	pr_smb(PR_STATUS, "FCC = %d[%d, %d] ,therm_scn: %d,system_temp_lv:%d,main percent :%d,main icl percent: %d\n",
 			fcc_ma, main_fastchg_current_ma,
 			supplied_parallel_fcc_ma,
@@ -3368,7 +3368,7 @@ static int smbchg_quick_charge_icl_set(struct smbchg_chip *chip,
 	return rc;
 }
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 
 #if USB_THERMAL_DEBUG
 static int dump_thermal_table(struct smbchg_chip *chip)
@@ -3533,7 +3533,7 @@ static int smbchg_system_temp_level_set(struct smbchg_chip *chip,
 	int rc = 0;
 	int prev_therm_lvl;
 	int thermal_fcc_ma;
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	int usb_icl_ma = 0;
 #endif
 
@@ -3576,7 +3576,7 @@ static int smbchg_system_temp_level_set(struct smbchg_chip *chip,
 		smbchg_main_chg_icl_percent = smbchg_main_chg_fcc_percent;
 	}
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	if(chip->therm_scn == THERMAL_SCN) {
 		if(chip->therm_scn_levels > 0 && chip->thermal_mitigation_scn !=NULL &&
 				lvl_sel < chip->therm_scn_levels) {
@@ -3589,7 +3589,7 @@ static int smbchg_system_temp_level_set(struct smbchg_chip *chip,
 	mutex_lock(&chip->therm_lvl_lock);
 	prev_therm_lvl = chip->therm_lvl_sel;
 	chip->therm_lvl_sel = lvl_sel;
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	if (chip->therm_lvl_sel == 0 && chip->therm_scn == THERMAL_NORMAL) {
 #else
 	if (chip->therm_lvl_sel == 0) {
@@ -3603,7 +3603,7 @@ static int smbchg_system_temp_level_set(struct smbchg_chip *chip,
 		vote(chip->usb_icl_votable, THERMAL_ICL_VOTER, false,0);
 
 	} else {
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 		if(chip->therm_scn == THERMAL_SCN) {
 			thermal_fcc_ma = (int)chip->thermal_mitigation_scn[chip->therm_lvl_sel];
 			usb_icl_ma = (int)chip->usb_thermal_mitigation[chip->therm_lvl_sel];
@@ -3620,7 +3620,7 @@ static int smbchg_system_temp_level_set(struct smbchg_chip *chip,
 
 			pr_info("temp lvl: %d,fcc ma:%d\n",
 				chip->therm_lvl_sel,thermal_fcc_ma);
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 		}
 #endif
 		rc = vote(chip->fcc_votable, THERMAL_FCC_VOTER, true,
@@ -4539,7 +4539,7 @@ static void smbchg_first_detect_float_work(struct work_struct *work)
 			rc);
 }
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 #define VBUS_MONITOR_MS   (1*1000)
 #define VBUS_MONITOR_CN   10
 #define MONITOR_CURRET_LIMIT_MA  (-10)
@@ -4603,7 +4603,7 @@ static void smbchg_external_power_changed(struct power_supply *psy)
 									rc);
 	}
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	check_charger_status(chip);
 #endif
 
@@ -6719,7 +6719,7 @@ static enum power_supply_property smbchg_battery_properties[] = {
 	POWER_SUPPLY_PROP_HEALTH,
 	POWER_SUPPLY_PROP_TECHNOLOGY,
 	POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL,
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	POWER_SUPPLY_PROP_SYSTEM_SCN,
 #endif
 	POWER_SUPPLY_PROP_FLASH_CURRENT_MAX,
@@ -6774,7 +6774,7 @@ static int smbchg_battery_set_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		smbchg_system_temp_level_set(chip, val->intval);
 		break;
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	case POWER_SUPPLY_PROP_SYSTEM_SCN:
 		smbchg_system_scn_level_set(chip,!!val->intval);
 		break;
@@ -6858,7 +6858,7 @@ static int smbchg_battery_is_writeable(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
 	case POWER_SUPPLY_PROP_CAPACITY:
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	case POWER_SUPPLY_PROP_SYSTEM_SCN:
 #endif
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX:
@@ -6921,7 +6921,7 @@ static int smbchg_battery_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		val->intval = chip->therm_lvl_sel;
 		break;
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	case POWER_SUPPLY_PROP_SYSTEM_SCN:
 		val->intval = chip->therm_scn;
 		break;
@@ -7197,7 +7197,7 @@ static irqreturn_t batt_warm_handler(int irq, void *_chip)
 	chip->batt_warm = !!(reg & HOT_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	if(chip->batt_warm && chip->jeita_monitor_enable)
 		schedule_delayed_work(&chip->batt_cool_warm_monitor,0);
 #endif
@@ -7219,7 +7219,7 @@ static irqreturn_t batt_cool_handler(int irq, void *_chip)
 	chip->batt_cool = !!(reg & COLD_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	if(chip->batt_cool && chip->jeita_monitor_enable)
 		schedule_delayed_work(&chip->batt_cool_warm_monitor,0);
 #endif
@@ -7481,7 +7481,7 @@ static void smbchg_weak_chg_timeout(struct work_struct *work)
 }
 
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 
 #define HYSTERISIS_DECIDEGC 20
 static void smbchg_batt_cool_warm_monitor(struct work_struct *work)
@@ -7640,7 +7640,7 @@ static irqreturn_t usbin_uv_handler(int irq, void *_chip)
 	int rc;
 	u8 reg;
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	schedule_delayed_work(&chip->vbus_monitor,msecs_to_jiffies(0));
 #endif
 
@@ -7751,7 +7751,7 @@ static irqreturn_t src_detect_handler(int irq, void *_chip)
 	bool src_detect = is_src_detect_high(chip);
 	int rc;
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	int vbus_mv = 0;
 	union power_supply_propval prop = {0,};
 	schedule_delayed_work(&chip->vbus_monitor,msecs_to_jiffies(0));
@@ -8929,7 +8929,7 @@ static int smb_parse_dt(struct smbchg_chip *chip)
 		}
 	}
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	rc = of_property_read_u32(node, "qcom,cool-bat-ma", &chip->batt_cool_ma);
 	if (rc == -EINVAL) {					\
 		pr_info("Couldn't read batt cool,default 0mA\n");
@@ -9911,7 +9911,7 @@ static int smbchg_probe(struct spmi_device *spmi)
 	INIT_DELAYED_WORK(&chip->first_detect_float_work,
 		smbchg_first_detect_float_work);
 	INIT_DELAYED_WORK(&chip->weak_charger_timeout_work, smbchg_weak_chg_timeout);
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	INIT_DELAYED_WORK(&chip->batt_cool_warm_monitor, smbchg_batt_cool_warm_monitor);
 	INIT_DELAYED_WORK(&chip->vbus_monitor, vbus_monitor_work);
 #endif
@@ -10096,7 +10096,7 @@ static int smbchg_probe(struct spmi_device *spmi)
 		delay_pd_state = false;
 	}
 
-#ifdef CONFIG_MACH_ZL1
+#ifdef CONFIG_PRODUCT_LE_ZL1
 	/*
 	 * workaround ldo19 current reverse boost
 	 */
